@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support Performance Dashboard</title>
+    <!-- Google Fonts: Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ApexCharts CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-laptop-code"></i>
+                    <span>IT SUPPORT</span>
+                </div>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li class="active"><a href="#dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#analysis"><i class="fa-solid fa-file-invoice"></i> บทวิเคราะห์ผู้บริหาร</a></li>
+                    <li><a href="#raw-data"><i class="fa-solid fa-list"></i> รายการแจ้งซ่อม</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="dot pulse"></span>
+                    <span id="data-status">กำลังโหลดข้อมูล...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Controls -->
+            <header class="header">
+                <div class="header-title">
+                    <h1>IT Service Performance Dashboard</h1>
+                    <p>ระบบติดตามและวิเคราะห์ประสิทธิภาพการดำเนินงาน ศูนย์สารสนเทศและสถิติ</p>
+                </div>
+                <div class="header-controls">
+                    <div class="filter-group">
+                        <label for="startDate"><i class="fa-regular fa-calendar"></i> เริ่มต้น:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="filter-group">
+                        <label for="endDate"><i class="fa-regular fa-calendar"></i> สิ้นสุด:</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <button id="refreshBtn" class="btn-refresh" title="รีเฟรชข้อมูล">
+                        <i class="fa-solid fa-rotate"></i> รีเฟรช
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Tab Content -->
+            <section id="dashboard-tab" class="tab-content active">
+                
+                <!-- KPI Summary Cards -->
+                <div class="kpi-grid">
+                    <!-- Total Cases (Blue) -->
+                    <div class="kpi-card kpi-total">
+                        <div class="kpi-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                        <div class="kpi-info">
+                            <h3>จำนวนงานซ่อมทั้งหมด</h3>
+                            <div class="kpi-value" id="kpi-total-val">0</div>
+                            <span class="kpi-subtext">เคสแจ้งซ่อมทั้งหมดในระบบ</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Under 15 Min (Green) -->
+                    <div class="kpi-card kpi-fast">
+                        <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="kpi-info">
+                            <h3>เสร็จไม่เกิน 15 นาที</h3>
+                            <div class="kpi-value" id="kpi-fast-val">0</div>
+                            <span class="kpi-subtext" id="kpi-fast-pct">0% ของงานทั้งหมด</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 15m - 2h (Yellow) -->
+                    <div class="kpi-card kpi-medium">
+                        <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="kpi-info">
+                            <h3>เสร็จ 15 นาที - 2 ชม.</h3>
+                            <div class="kpi-value" id="kpi-medium-val">0</div>
+                            <span class="kpi-subtext" id="kpi-medium-pct">0% ของงานทั้งหมด</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Over 2h (Red) -->
+                    <div class="kpi-card kpi-slow">
+                        <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-info">
+                            <h3>เสร็จเกิน 2 ชั่วโมง</h3>
+                            <div class="kpi-value" id="kpi-slow-val">0</div>
+                            <span class="kpi-subtext" id="kpi-slow-pct">0% ของงานทั้งหมด</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Average Resolution Time (Gradient/Blue border) -->
+                    <div class="kpi-card kpi-average">
+                        <div class="kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                        <div class="kpi-info">
+                            <h3>เวลาเฉลี่ยในการซ่อม</h3>
+                            <div class="kpi-value" id="kpi-avg-val">0.0</div>
+                            <span class="kpi-subtext">นาทีต่อเคส (ไม่รวมเคสข้อมูลผิดพลาด)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Container Grid -->
+                <div class="charts-grid">
+                    <!-- Chart 1: Departments -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2><i class="fa-solid fa-building"></i> แผนกที่ซ่อมมากที่สุด (Top 10)</h2>
+                        </div>
+                        <div class="chart-body">
+                            <div id="chart-departments"></div>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Equipment -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2><i class="fa-solid fa-microchip"></i> อุปกรณ์ที่แจ้งซ่อมมากที่สุด</h2>
+                        </div>
+                        <div class="chart-body">
+                            <div id="chart-equipment"></div>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Problem types -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2><i class="fa-solid fa-bug"></i> อาการปัญหาที่พบบ่อย (Top 10)</h2>
+                        </div>
+                        <div class="chart-body">
+                            <div id="chart-problems"></div>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4: Tech performance -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2><i class="fa-solid fa-user-gear"></i> ประสิทธิภาพของช่างซ่อมรายบุคคล</h2>
+                            <span class="chart-subtitle">เปรียบเทียบภาระงานและเวลาปิดงานเฉลี่ย</span>
+                        </div>
+                        <div class="chart-body">
+                            <div id="chart-technicians"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Executive Analysis Tab Content -->
+            <section id="analysis-tab" class="tab-content">
+                <div class="analysis-container">
+                    <div class="analysis-card header-banner">
+                        <i class="fa-solid fa-file-invoice-dollar banner-icon"></i>
+                        <div class="banner-text">
+                            <h2>บทวิเคราะห์ประสิทธิภาพและข้อเสนอแนะสำหรับผู้บริหาร</h2>
+                            <p>ศูนย์สารสนเทศและสถิติ ประจำปีงบประมาณ 2568 - 2569</p>
+                        </div>
+                    </div>
+
+                    <div class="analysis-grid-layout">
+                        <!-- Key Insights Column -->
+                        <div class="analysis-main-column">
+                            <div class="analysis-card">
+                                <h3><i class="fa-solid fa-chart-pie"></i> ประเมินผลลัพธ์การดำเนินงานภาพรวม</h3>
+                                <p>จากการวิเคราะห์ข้อมูลการแจ้งซ่อมงานสนับสนุนด้านเทคโนโลยีสารสนเทศ (IT Support) มีแนวโน้มเชิงสถิติและข้อเสนอแนะที่ผู้บริหารควรพิจารณาดังนี้:</p>
+                                
+                                <div class="insight-bullet">
+                                    <div class="bullet-number">1</div>
+                                    <div class="bullet-desc">
+                                        <h4>เครื่องพิมพ์ (Printer) มีอัตราการซ่อมสูงที่สุด</h4>
+                                        <p>งานซ่อมปริ้นเตอร์คิดเป็นสัดส่วน **48.2% (847 เคส)** ของงานบริการทั้งหมด ซึ่งถือเป็นเกือบครึ่งหนึ่งของภาระงาน อย่างไรก็ตาม เครื่องพิมพ์ใช้เวลาจัดการค่อนข้างเร็ว (เฉลี่ย **9.76 นาที**) ปัญหาหลักเกิดจากกระดาษติด ปริ้นเตอร์ค้าง หรือการเชื่อมต่อเครือข่ายหลุด</p>
+                                    </div>
+                                </div>
+
+                                <div class="insight-bullet">
+                                    <div class="bullet-number">2</div>
+                                    <div class="bullet-desc">
+                                        <h4>งานคอมพิวเตอร์และซอฟต์แวร์ใช้เวลาดำเนินการสูงที่สุด</h4>
+                                        <p>คอมพิวเตอร์ (Computer) คิดเป็นสัดส่วน **42.6% (748 เคส)** แต่ใช้ระยะเวลาในการซ่อมเฉลี่ยสูงถึง **26.18 นาที** (นานกว่าปริ้นเตอร์เกือบ 3 เท่า) และปัญหาด้านระบบปฏิบัติการ/โปรแกรม (Software) ใช้เวลานานเฉลี่ยสูงสุดถึง **31.96 นาที** เนื่องจากต้องใช้เวลาแก้ไฟล์ ติดตั้งไดรเวอร์ หรือตั้งค่าสิทธิ์ผู้ใช้ใหม่</p>
+                                    </div>
+                                </div>
+
+                                <div class="insight-bullet">
+                                    <div class="bullet-number">3</div>
+                                    <div class="bullet-desc">
+                                        <h4>การกระจุกตัวของงานที่หน่วยงานด่านหน้า (Frontline Departments)</h4>
+                                        <p>แผนก **การเงิน** (125 เคส) และ **ห้องยา** (73 เคส) เป็นหน่วยงานที่แจ้งซ่อมไอทีบ่อยที่สุด เนื่องจากเป็นแผนกที่มีความต้องการพิมพ์ใบเสร็จและฉลากยาสูงตลอดทั้งวัน หากระบบคอมพิวเตอร์หรือเครื่องปริ้นเตอร์ขัดข้อง จะส่งผลกระทบต่อเนื่องถึงความพึงพอใจและการรอคอยคิวบริการของผู้รับบริการเป็นอย่างมาก</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="analysis-card">
+                                <h3><i class="fa-solid fa-lightbulb"></i> ข้อเสนอแนะเชิงนโยบายเพื่อเพิ่มประสิทธิภาพ</h3>
+                                
+                                <div class="rec-box">
+                                    <div class="rec-title"><i class="fa-solid fa-screwdriver-wrench"></i> 1. นโยบายลดเวลาซ่อมแซมคอมพิวเตอร์และซอฟต์แวร์</div>
+                                    <p>จัดตั้งโครงการลงระบบปฏิบัติการอัตโนมัติ (Automated OS Deployment) และจัดทำ **Golden Image** มาตรฐานขององค์กร เพื่อลดขั้นตอนและเวลาการลงโปรแกรมทีละเครื่องด้วยมือ รวมทั้งส่งเสริมการแก้ไขปัญหาผ่านระบบ Remote Desktop ในกรณีที่ปัญหาเป็นเรื่องทางซอฟต์แวร์ เพื่อลดเวลาเดินทางของช่างซ่อม</p>
+                                </div>
+                                
+                                <div class="rec-box">
+                                    <div class="rec-title"><i class="fa-solid fa-graduation-cap"></i> 2. การบริหารจัดการและกระจายทักษะภายในทีม IT</div>
+                                    <p>ช่างซ่อม 4 คนหลักคือ **ช่างแมน** และ **ช่างบอล** (รับงานรวมกัน > 54% เวลาเฉลี่ย ~14 นาที) และ **ช่างต้อง** (20.2%, เวลาเฉลี่ย ~16.6 นาที) ถือเป็นผู้มีประสิทธิภาพสูงในการบริการ ในขณะที่ **ช่างอ้วน** (21.9%, เวลาเฉลี่ย 28.03 นาที) ใช้เวลาทำงานค่อนข้างช้ากว่าเพื่อร่วมงาน ควรมีการแบ่งปันความรู้ (Knowledge Sharing) และตรวจสอบสาเหตุว่าเวลาซ่อมที่สูงเกิดจากปัญหาประเภทที่ซับซ้อนกว่า หรือเป็นข้อจำกัดเรื่องทักษะการทำงาน</p>
+                                </div>
+
+                                <div class="rec-box">
+                                    <div class="rec-title"><i class="fa-solid fa-clipboard-check"></i> 3. ปรับปรุงคุณภาพการบันทึกข้อมูลบริการ (Data Quality)</div>
+                                    <p>มีข้อมูลที่มีข้อผิดพลาดในการป้อนข้อมูลเวลาในอดีต (เช่น บันทึกเป็นเลข 4 หลักโดยลืมจุดทศนิยม หรือเวลาการซ่อมเสร็จก่อนเวลาแจ้ง) จำนวน 43 เคส ควรมีการเปิดใช้งานระบบล็อกอินที่ตรวจสอบข้อมูล (Data Validation) บนตารางบันทึก หรือพัฒนาเว็บแอปสำหรับกรอกฟอร์มที่ป้องกันการบันทึกเวลาที่ผิดรูปแบบในอนาคต</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Info Column -->
+                        <div class="analysis-side-column">
+                            <div class="analysis-card info-card">
+                                <h3><i class="fa-solid fa-users"></i> ข้อมูลโครงสร้างทีมปฏิบัติงาน</h3>
+                                <div class="info-item">
+                                    <strong>ช่างปฏิบัติงานประจำ:</strong>
+                                    <p>แมน, บอล, ต้อง, อ้วน, อู๋</p>
+                                </div>
+                                <div class="info-item alert-info-item">
+                                    <strong>ช่างช่วยเหลือภายนอก (Part-time):</strong>
+                                    <p>ปู, บุ้ง, กิ๊ฟ</p>
+                                    <span class="badge badge-warning">ไม่ใช่ช่างประจำ</span>
+                                    <p class="sub-info-desc">ปฏิบัติงานเฉพาะบางวันเพื่อสนับสนุนเมื่อปริมาณงานซ่อมสะสมหรือช่างประจำติดภารกิจอื่น จึงมีปริมาณงานซ่อมรวมกันค่อนข้างน้อยในฐานข้อมูล</p>
+                                </div>
+                            </div>
+
+                            <div class="analysis-card kpi-mini-card">
+                                <h3><i class="fa-solid fa-gauge-high"></i> ดัชนีประสิทธิภาพหลัก (KPIs)</h3>
+                                <div class="gauge-metric">
+                                    <div class="gauge-title">อัตราการแก้ไขปัญหาได้เสร็จใน 15 นาที (SLA Target)</div>
+                                    <div class="gauge-stat" id="analysis-sla-pct">0%</div>
+                                    <div class="gauge-bar-bg">
+                                        <div class="gauge-bar-fill" id="analysis-sla-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Raw Data Tab Content -->
+            <section id="raw-data-tab" class="tab-content">
+                <div class="raw-data-container">
+                    <div class="raw-data-header">
+                        <h2><i class="fa-solid fa-list-check"></i> บันทึกรายการแจ้งซ่อมทั้งหมด</h2>
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchData" placeholder="ค้นหาตามหน่วยงาน, อาการ, ช่าง...">
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>วันที่</th>
+                                    <th>ช่างผู้ปฏิบัติงาน</th>
+                                    <th>หน่วยงาน</th>
+                                    <th>ตึก/ชั้น</th>
+                                    <th>อุปกรณ์</th>
+                                    <th>ประเภทงาน</th>
+                                    <th>เวลาแจ้ง</th>
+                                    <th>เวลาเสร็จ</th>
+                                    <th>ระยะเวลา (นาที)</th>
+                                    <th>รายละเอียดปัญหา</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <!-- Dynamic rows inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-pagination">
+                        <span id="table-info">แสดง 0 ถึง 0 จาก 0 รายการ</span>
+                        <div class="pagination-buttons">
+                            <button id="prevPage" class="btn-page"><i class="fa-solid fa-chevron-left"></i> ก่อนหน้า</button>
+                            <button id="nextPage" class="btn-page">ถัดไป <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- PapaParse for CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- ApexCharts JS -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
