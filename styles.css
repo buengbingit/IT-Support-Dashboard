@@ -530,6 +530,39 @@ body {
     width: 100%;
 }
 
+/* Custom ApexCharts Legend Styles */
+.apexcharts-legend {
+    padding: 14px 16px !important;
+    background: #f8fafc !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-color) !important;
+    max-height: 190px;
+    overflow-y: auto !important;
+    gap: 6px 12px !important;
+}
+
+.apexcharts-legend-series {
+    margin: 3px 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    background: #ffffff;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+}
+
+.apexcharts-legend-series:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.apexcharts-legend-text {
+    font-size: 0.85rem !important;
+    color: var(--text-primary) !important;
+}
+
 /* Executive Analysis Styling */
 .analysis-container {
     display: flex;

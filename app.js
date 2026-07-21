@@ -402,35 +402,97 @@ function getGroupedData(key, topN = 10) {
     return top;
 }
 
-// Chart 1: Departments Pie Chart
-function renderDepartmentsChart() {
-    const data = getGroupedData("department", 10);
-    const labels = data.map(d => d.name);
-    const series = data.map(d => d.value);
-    
-    const options = {
+// Vibrant Color Palette for Pie Charts
+const VIBRANT_PALETTE = [
+    '#2563EB', // ฟ้าเข้มสด (Bright Blue)
+    '#10B981', // เขียวมรกต (Emerald Green)
+    '#F59E0B', // ส้มอมเหลือง (Amber)
+    '#EF4444', // แดงสด (Vibrant Red)
+    '#8B5CF6', // ม่วงสด (Purple)
+    '#EC4899', // ชมพูสด (Pink)
+    '#06B6D4', // ฟ้าเทอร์ควอยซ์ (Cyan)
+    '#F97316', // ส้มแสด (Orange)
+    '#84CC16', // เขียวมะนาว (Lime)
+    '#6366F1', // คราม Indigo
+    '#64748B'  // เทา Slate (สำหรับ อื่นๆ)
+];
+
+// Helper to generate unified Donut Chart Options with List Legend & Counts
+function createPieChartOptions(labels, series) {
+    return {
         series: series,
         labels: labels,
         chart: {
             type: 'donut',
-            height: 380,
+            height: 420,
             fontFamily: 'Prompt, sans-serif'
         },
-        legend: {
-            position: 'bottom'
+        colors: VIBRANT_PALETTE,
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '52%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            showAlways: true,
+                            label: 'รวมทั้งหมด',
+                            fontSize: '13px',
+                            fontFamily: 'Prompt, sans-serif',
+                            fontWeight: 600,
+                            color: '#64748b',
+                            formatter: function (w) {
+                                const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                return total.toLocaleString() + ' เคส';
+                            }
+                        }
+                    }
+                }
+            }
         },
         dataLabels: {
             enabled: true,
+            style: {
+                fontSize: '11px',
+                fontFamily: 'Prompt, sans-serif',
+                fontWeight: 600
+            },
+            dropShadow: {
+                enabled: false
+            },
             formatter: function (val) {
-                return val.toFixed(1) + "%";
+                return val > 3 ? val.toFixed(1) + "%" : "";
             }
         },
-        colors: ['#0284c7', '#0ea5e9', '#38bdf8', '#7dd3fc', '#bae6fd', '#0d9488', '#0f766e', '#14b8a6', '#5eead4', '#99f6e4', '#94a3b8'],
+        legend: {
+            position: 'bottom',
+            horizontalAlign: 'left',
+            fontSize: '13px',
+            fontFamily: 'Prompt, sans-serif',
+            fontWeight: 500,
+            labels: {
+                colors: '#334155'
+            },
+            markers: {
+                width: 12,
+                height: 12,
+                radius: 3
+            },
+            itemMargin: {
+                horizontal: 10,
+                vertical: 4
+            },
+            formatter: function (seriesName, opts) {
+                const val = opts.w.globals.series[opts.seriesIndex];
+                return `${seriesName}: <strong style="color: #0f172a;">${val.toLocaleString()} เคส</strong>`;
+            }
+        },
         responsive: [{
             breakpoint: 480,
             options: {
                 chart: {
-                    height: 300
+                    height: 360
                 },
                 legend: {
                     position: 'bottom'
@@ -438,6 +500,15 @@ function renderDepartmentsChart() {
             }
         }]
     };
+}
+
+// Chart 1: Departments Pie Chart
+function renderDepartmentsChart() {
+    const data = getGroupedData("department", 10);
+    const labels = data.map(d => d.name);
+    const series = data.map(d => d.value);
+    
+    const options = createPieChartOptions(labels, series);
     
     if (charts.departments) {
         charts.departments.destroy();
@@ -452,36 +523,7 @@ function renderEquipmentChart() {
     const labels = data.map(d => d.name);
     const series = data.map(d => d.value);
     
-    const options = {
-        series: series,
-        labels: labels,
-        chart: {
-            type: 'donut',
-            height: 380,
-            fontFamily: 'Prompt, sans-serif'
-        },
-        legend: {
-            position: 'bottom'
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-                return val.toFixed(1) + "%";
-            }
-        },
-        colors: ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a', '#64748b', '#94a3b8', '#cbd5e1'],
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    height: 300
-                },
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }]
-    };
+    const options = createPieChartOptions(labels, series);
     
     if (charts.equipment) {
         charts.equipment.destroy();
@@ -496,36 +538,7 @@ function renderProblemsChart() {
     const labels = data.map(d => d.name);
     const series = data.map(d => d.value);
     
-    const options = {
-        series: series,
-        labels: labels,
-        chart: {
-            type: 'donut',
-            height: 380,
-            fontFamily: 'Prompt, sans-serif'
-        },
-        legend: {
-            position: 'bottom'
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-                return val.toFixed(1) + "%";
-            }
-        },
-        colors: ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0', '#f1f5f9', '#f8fafc', '#d1d5db'],
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    height: 300
-                },
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }]
-    };
+    const options = createPieChartOptions(labels, series);
     
     if (charts.problems) {
         charts.problems.destroy();
